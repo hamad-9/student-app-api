@@ -1,3 +1,7 @@
-from django.contrib import admin  # noqa
+"""
+Django admin customization.
+"""
+from django.contrib import admin
+from core import models
 
-# Register your models here.
+admin.site.register(models.Student)
