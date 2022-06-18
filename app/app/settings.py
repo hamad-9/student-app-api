@@ -38,10 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-
     'core',
     'student',
 ]
+
+REST_FRAMEWORK = {
+    'SEARCH_PARAM': 'search'
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

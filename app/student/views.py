@@ -6,24 +6,28 @@ from core.models import Student
 from student.serializers import StudentSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework import status
+from rest_framework import generics
+from rest_framework import filters
 
 
-class StudentList(APIView):
+class CustomSearchFilter(filters.SearchFilter):
     """
-    List all students, or create a new student.
+    Custom search filter for StudentList api.
     """
-    def get(self, request, format=None):
-        students = Student.objects.all()
-        serializer = StudentSerializer(students, many=True)
-        return Response(serializer.data)
+    search_param = "name"
 
-    def post(self, request, format=None):
-        serializer = StudentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class StudentList(generics.CreateAPIView, generics.ListAPIView):
+    """
+    Retrieve all students, or students whose names contain a particular regex.
+    Create new student.
+    """
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    filter_backends = [CustomSearchFilter]
+    search_fields = ['$name']
 
 
 class StudentDetail(APIView):
@@ -36,12 +40,12 @@ class StudentDetail(APIView):
         except Student.DoesNotExist:
             raise Http404
 
-    def get(self, request, pk, format=None):
+    def get(self, request: Request, pk, format=None):
         student = self.get_object(pk)
         serializer = StudentSerializer(student)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
+    def put(self, request: Request, pk, format=None):
         student = self.get_object(pk)
         serializer = StudentSerializer(student, data=request.data)
         if serializer.is_valid():
@@ -49,7 +53,7 @@ class StudentDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
+    def delete(self, request: Request, pk, format=None):
         student = self.get_object(pk)
         student.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
