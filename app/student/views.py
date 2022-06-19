@@ -21,8 +21,8 @@ class CustomSearchFilter(filters.SearchFilter):
 
 class StudentList(generics.CreateAPIView, generics.ListAPIView):
     """
-    Retrieve all students, or students whose names contain a particular regex.
-    Create new student.
+    Retrieve all students, retrieve students whose names contain a
+    particular regex, or create new student.
     """
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
